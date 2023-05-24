@@ -1,0 +1,35 @@
+name: Portal-Revamp-Dev-Deployment
+on:
+  push:
+    branches: [ dev ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Deploy to EC2
+      uses: appleboy/ssh-action@master
+      env:
+        USERNAME: ubuntu
+        HOST: ec2-18-116-103-141.us-east-2.compute.amazonaws.com
+        SCRIPT: ~/dev-PortalDockerscript.sh
+        KEY: ${{ secrets.DEV_PRIVATE_KEY }}
+        
+    - name: Send mail
+      if: ${{ failure() }}
+      uses: dawidd6/action-send-mail@v2
+      with:
+          # mail server settings
+          server_address: smtp.gmail.com
+          server_port: 465
+          # user credentials
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          # email subject
+          subject: ${{ github.job }} job of ${{ github.repository }} has FAILED.
+          # email body as text
+          body: ${{ github.job }} job in worflow ${{ github.workflow }} of ${{ github.repository }} has ${{ job.status }}
+          # comma-separated string, send email to
+          to: junaid.husnain@lathran.com
+          # from email name
+          from: PORTAL-REVAMP-DEV PIPELINE FAILURE

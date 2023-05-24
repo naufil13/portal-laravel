@@ -1,0 +1,54 @@
+version: '3.7'
+
+services:
+    app:
+        build:
+            context: .
+            dockerfile: /var/www/erx-portal-revamp/Dockerfile
+        container_name: erx-portal-revamp-app
+        ports:
+            - "1000:1000"
+        volumes:
+            - ./:/var/www/
+        networks:
+            - erx-portal-revamp-network
+        depends_on:
+            - mysql
+    mysql:
+        image: mysql:8.0
+        container_name: erx-portal-revamp-db
+        ports:
+            - "3309:3309"
+        environment:
+            MYSQL_DATABASE: portal
+            MYSQL_ROOT_PASSWORD: Apache21
+            MYSQL_PASSWORD: Apache21
+            MYSQL_USER: portal
+            MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+        volumes:
+            - db-data:/var/lib/mysql
+        networks:
+            - erx-portal-revamp-network
+
+    phpmyadmin:
+        image: phpmyadmin:latest
+        container_name: erx-portal-revamp-phpmyadmin
+        ports:
+            - 1100:80
+        volumes:
+            - /sessions
+        environment:
+          PMA_HOST: mysql
+          UPLOAD_LIMIT: 1000M
+        depends_on:
+            - mysql
+        links:
+          - mysql
+        networks:
+            - erx-portal-revamp-network
+
+networks:
+    erx-portal-revamp-network:
+        driver: bridge
+volumes:
+  db-data:

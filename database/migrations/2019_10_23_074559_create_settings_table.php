@@ -1,0 +1,35 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class CreateSettingsTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('options', function (Blueprint $table) {
+            $table->engine = env('DATABASE_ENGINE');
+            $table->bigIncrements('id');
+            $table->string('name', 100);
+            $table->text('value');
+            $table->enum('access', ['Public', 'Private']);
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('settings');
+    }
+}
